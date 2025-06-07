@@ -1,5 +1,6 @@
 import streamlit as st
-from components.interactive import display_interactive_chart
+import pandas as pd
+import altair as alt
 
 
 def experience_page():
@@ -25,7 +26,7 @@ def experience_page():
 
     - Supported the Grande Boutique team in planning and executing the Spring/Summer product launch  
     - Conducted competitive benchmarking and consumer surveys; synthesized insights into executive presentation decks  
-    - Coordinated social media teasers, boosting Instagram engagement by 15% during campaign period  
+    - Coordinated social media teasers, boosting Instagram engagement by 15% during the campaign period  
     """)
 
     # — Digital Marketing Intern, L’Oréal Groupe —
@@ -54,28 +55,68 @@ def experience_page():
         },
         {
             "title": "Omnichannel Retail Audit for LV Spring/Summer Launch",
-            "description": "Conducted competitor and customer journey assessments across online and offline touchpoints for a Spring/Summer product rollout.",
+            "description": "Conducted competitor and customer journey assessments across online and offline touchpoints.",
             "skills": ["Excel", "Consumer Surveys", "Benchmarking", "Presentation"],
             "outcome": "Shared findings with senior management to refine channel activation plans."
         },
         {
             "title": "AR Try-On Conversion A/B Test",
-            "description": "Designed and executed A/B test comparing virtual try-on vs static images for a lip product campaign.",
+            "description": "Designed and executed A/B test for virtual try-on vs static images.",
             "skills": ["GA4", "Optimizely", "R", "Statistical Analysis"],
             "outcome": "Identified a 14% lift in add-to-cart rate for the AR variant."
         }
     ]
 
     for i, proj in enumerate(projects):
-        with st.expander(proj["title"], expanded=i == 0):
+        with st.expander(proj["title"], expanded=(i == 0)):
             st.markdown(f"**Description:** {proj['description']}")
             st.markdown(f"**Skills Used:** {', '.join(proj['skills'])}")
             st.markdown(f"**Outcome:** {proj['outcome']}")
 
-    # 示例交互图表 – 可删除
-    with st.expander("Interactive Data Visualization Demo", expanded=False):
-        st.markdown("**Description:** Sample interactive chart used in insights sharing.")
-        display_interactive_chart()
+    st.markdown("---")
+
+    # ─────────────────────────────
+    # INTERACTIVE DATA VISUALIZATION
+    # ─────────────────────────────
+    with st.expander("Interactive Data Visualization ", expanded=False):
+        st.markdown("**Description:** Key KPI trends for each internship role.")
+
+        # Chanel: Monthly Foot Traffic Uplift
+        chanel_data = pd.DataFrame({
+            'Month': ['Feb', 'Mar', 'Apr', 'May'],
+            'Foot Traffic Uplift (%)': [5, 8, 10, 10]
+        })
+        chanel_chart = alt.Chart(chanel_data).mark_line(point=True).encode(
+            x=alt.X('Month:N', title='Month'),
+            y=alt.Y('Foot Traffic Uplift (%):Q', title='Uplift (%)'),
+            tooltip=['Month', 'Foot Traffic Uplift (%)']
+        ).properties(title='Chanel Foot Traffic Uplift', width=200, height=200)
+
+        # Louis Vuitton: Weekly Instagram Engagement Rate
+        lv_data = pd.DataFrame({
+            'Week': ['W1', 'W2', 'W3', 'W4'],
+            'Engagement Rate (%)': [12, 14, 15, 15]
+        })
+        lv_chart = alt.Chart(lv_data).mark_area(opacity=0.6).encode(
+            x=alt.X('Week:N', title='Week'),
+            y=alt.Y('Engagement Rate (%):Q', title='Engagement (%)'),
+            tooltip=['Week', 'Engagement Rate (%)']
+        ).properties(title='LV Instagram Engagement Rate', width=200, height=200)
+
+        # L'Oréal: ROI Improvement by Campaign Phase
+        loreal_data = pd.DataFrame({
+            'Phase': ['Planning', 'Launch', 'Optimization'],
+            'ROI Improvement (%)': [5, 8, 12]
+        })
+        loreal_chart = alt.Chart(loreal_data).mark_bar().encode(
+            x=alt.X('ROI Improvement (%):Q', title='Improvement (%)'),
+            y=alt.Y('Phase:N', sort='-x', title='Campaign Phase'),
+            tooltip=['Phase', 'ROI Improvement (%)']
+        ).properties(title="L'Oréal ROI Improvement", width=200, height=200)
+
+        # Display charts side by side
+        combined = alt.hconcat(chanel_chart, lv_chart, loreal_chart).resolve_scale(y='independent')
+        st.altair_chart(combined, use_container_width=True)
 
     st.markdown("---")
 

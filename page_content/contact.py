@@ -8,9 +8,9 @@ def contact_page():
     Feel free to reach out to me through any of the following channels:
     
     ### Direct Contact
-    - **Email**: [Lewis.liu@email.com](mailto:Lewis.liu@email.com)
+    - **Email**: [Louise.liu@email.com](mailto:Louise.liu@email.com)
     - **Phone**: +33 6 12 34 56 78
-    - **LinkedIn**: [linkedin.com/in/Lewisliu](https://linkedin.com/in/Lewisliu)
+    - **LinkedIn**: [linkedin.com/in/Louiseliu](https://linkedin.com/in/Louiseliu)
     """)
     
     st.markdown("### Send Me a Message")
