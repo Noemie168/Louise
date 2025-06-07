@@ -78,10 +78,12 @@ def experience_page():
     # ─────────────────────────────
     # INTERACTIVE DATA VISUALIZATION
     # ─────────────────────────────
-    with st.expander("Interactive Data Visualization ", expanded=False):
-        st.markdown("**Description:** Key KPI trends for each internship role.")
+    with st.expander("Interactive Data Visualization", expanded=False):
+        st.markdown("**Description:** Select an internship or project to view its KPI chart and download the data as CSV.")
 
-        # Chanel: Monthly Foot Traffic Uplift
+        # Prepare datasets and charts
+
+        # Chanel internship data
         chanel_data = pd.DataFrame({
             'Month': ['Feb', 'Mar', 'Apr', 'May'],
             'Foot Traffic Uplift (%)': [5, 8, 10, 10]
@@ -90,9 +92,9 @@ def experience_page():
             x=alt.X('Month:N', title='Month'),
             y=alt.Y('Foot Traffic Uplift (%):Q', title='Uplift (%)'),
             tooltip=['Month', 'Foot Traffic Uplift (%)']
-        ).properties(title='Chanel Foot Traffic Uplift', width=200, height=200)
+        )
 
-        # Louis Vuitton: Weekly Instagram Engagement Rate
+        # Louis Vuitton internship data
         lv_data = pd.DataFrame({
             'Week': ['W1', 'W2', 'W3', 'W4'],
             'Engagement Rate (%)': [12, 14, 15, 15]
@@ -101,22 +103,76 @@ def experience_page():
             x=alt.X('Week:N', title='Week'),
             y=alt.Y('Engagement Rate (%):Q', title='Engagement (%)'),
             tooltip=['Week', 'Engagement Rate (%)']
-        ).properties(title='LV Instagram Engagement Rate', width=200, height=200)
+        )
 
-        # L'Oréal: ROI Improvement by Campaign Phase
+        # L'Oréal internship data
         loreal_data = pd.DataFrame({
             'Phase': ['Planning', 'Launch', 'Optimization'],
             'ROI Improvement (%)': [5, 8, 12]
         })
         loreal_chart = alt.Chart(loreal_data).mark_bar().encode(
             x=alt.X('ROI Improvement (%):Q', title='Improvement (%)'),
-            y=alt.Y('Phase:N', sort='-x', title='Campaign Phase'),
+            y=alt.Y('Phase:N', sort='-x', title='Phase'),
             tooltip=['Phase', 'ROI Improvement (%)']
-        ).properties(title="L'Oréal ROI Improvement", width=200, height=200)
+        )
 
-        # Display charts side by side
-        combined = alt.hconcat(chanel_chart, lv_chart, loreal_chart).resolve_scale(y='independent')
-        st.altair_chart(combined, use_container_width=True)
+        # Live-Streaming project data
+        sent_df = pd.DataFrame({
+            'Sentiment': ['Positive', 'Neutral', 'Negative'],
+            'Percentage': [65, 25, 10]
+        })
+        sent_chart = alt.Chart(sent_df).mark_arc(innerRadius=30).encode(
+            theta=alt.Theta('Percentage:Q', title=''),
+            color=alt.Color('Sentiment:N', scale=alt.Scale(range=['#4CAF50','#FFC107','#F44336'])),
+            tooltip=['Sentiment', 'Percentage']
+        )
+
+        # Omnichannel audit project data
+        om_df = pd.DataFrame({
+            'Metric': ['Online Path Completion', 'In-Store Conversion', 'Cart Abandonment'],
+            'Value (%)': [80, 30, 20]
+        })
+        om_chart = alt.Chart(om_df).mark_bar().encode(
+            x=alt.X('Value (%):Q', title='Percentage (%)'),
+            y=alt.Y('Metric:N', sort='-x', title=None),
+            tooltip=['Metric', 'Value (%)']
+        )
+
+        # AR Try-On A/B Test project data
+        ab_df = pd.DataFrame([
+            {'Variant': 'Static', 'CTR (%)': 8, 'Add-to-Cart (%)': 10},
+            {'Variant': 'AR', 'CTR (%)': 22, 'Add-to-Cart (%)': 24}
+        ])
+        ab_long = ab_df.melt(id_vars=['Variant'], var_name='Metric', value_name='Value')
+        ab_chart = alt.Chart(ab_long).mark_bar().encode(
+            x=alt.X('Value:Q', title='Percentage (%)'),
+            y=alt.Y('Variant:N', title=None),
+            color='Metric:N',
+            tooltip=['Variant', 'Metric', 'Value']
+        )
+
+        # Map selections to data and charts
+        options = {
+            'Chanel Foot Traffic': (chanel_data, chanel_chart),
+            'LV Instagram Engagement': (lv_data, lv_chart),
+            "L'Oréal ROI Improvement": (loreal_data, loreal_chart),
+            'Live-Stream Sentiment': (sent_df, sent_chart),
+            'Omnichannel Audit': (om_df, om_chart),
+            'AR Try-On A/B Test': (ab_long, ab_chart)
+        }
+
+        choice = st.selectbox('Select a dataset', list(options.keys()))
+        df, chart = options[choice]
+        st.altair_chart(chart, use_container_width=True)
+
+        # Download CSV
+        csv = df.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label='Download CSV',
+            data=csv,
+            file_name=f"{choice.replace(' ','_')}.csv",
+            mime='text/csv'
+        )
 
     st.markdown("---")
 
@@ -126,7 +182,6 @@ def experience_page():
     st.markdown("## Professional Skills")
 
     col1, col2 = st.columns(2)
-
     with col1:
         st.markdown("""
         ### Marketing & Analytics  
@@ -135,7 +190,6 @@ def experience_page():
         - **Digital Marketing:** Meta Ads Manager · WeChat Ads · Paid Social Campaigns  
         - **Visual:** Canva  
         """)
-
     with col2:
         st.markdown("""
         ### Soft Skills  
@@ -144,5 +198,5 @@ def experience_page():
         - **Languages:** Mandarin (Native) · English (Fluent) · French (Advanced)  
         - **Leadership:** Organized workshops for HEC Marketing Club and led teams to case competition wins  
         """)
-
+    
     st.markdown("---")
